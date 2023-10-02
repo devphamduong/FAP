@@ -6,8 +6,8 @@ import {
   Outlet,
   RouterProvider,
 } from "react-router-dom";
-import ScheduleOfWeek from './TimeTable/ScheduleOfWeek';
-import TimeTable from './TimeTable/TimeTable';
+import ScheduleOfWeek from './components/TimeTable/ScheduleOfWeek';
+import TimeTable from './components/TimeTable/TimeTable';
 
 const Layout = () => {
   return (
