@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Breadcrumb, Table, DatePicker, Space } from "antd";
+import { Breadcrumb, Table, DatePicker, Space, Button } from "antd";
 import { Link } from "react-router-dom";
 import './TimeTable.scss';
 import { getAllSchedule } from '../../services/api';
 import _ from 'lodash';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import dayjs from 'dayjs';
+import moment from 'moment/moment';
 
 dayjs.extend(customParseFormat);
 
@@ -177,13 +178,34 @@ function ScheduleOfWeek(props) {
 
     const [scheduleOfWeek, setScheduleOfWeek] = useState(slots);
     const [rangeWeek, setRangeWeek] = useState();
-    const [sortQuery, setSortQuery] = useState('');
+    const [sortQuery, setSortQuery] = useState(`startDate=${moment().startOf('week').format('MM/DD/YYYY')}&endDate=${moment().endOf('week').format('MM/DD/YYYY')}`);
+
+    const weekFormat = 'MM/DD';
+
+    const customWeekStartEndFormat = (value) =>
+        `${dayjs(value).startOf('week').format(weekFormat)} - ${dayjs(value)
+            .endOf('week')
+            .format(weekFormat)}`;
+
+    const handleChangeWeek = (date, dateString) => {
+        let query = buildRangeWeek(date.$d.getFullYear(), dateString.split(' - '));
+        if (query !== sortQuery) {
+            setSortQuery(query);
+        }
+    };
 
     const columns = [
         {
-            title: 'WEEK',
+            title:
+                <>
+                    <p>WEEK</p>
+                    <span>
+                        <DatePicker size='small' allowClear={false} defaultValue={dayjs()} format={customWeekStartEndFormat} picker="week" onChange={handleChangeWeek} style={{ cursor: 'pointer' }} />
+                    </span>
+                </>,
             dataIndex: 'name',
             key: 'name',
+            width: '11%'
         },
         {
             title: 'MON',
@@ -229,24 +251,9 @@ function ScheduleOfWeek(props) {
         },
     ];
 
-    const weekFormat = 'MM/DD';
-
-    const customWeekStartEndFormat = (value) =>
-        `${dayjs(value).startOf('week').format(weekFormat)} - ${dayjs(value)
-            .endOf('week')
-            .format(weekFormat)}`;
-
     const buildRangeWeek = (year, dates) => {
         let query = `startDate=${dates[0]}/${year}&endDate=${dates[1]}/${year}`;
         return query;
-    };
-
-    const handleChangeWeek = (date, dateString) => {
-        let query = buildRangeWeek(date.$d.getFullYear(), dateString.split(' - '));
-        if (query !== sortQuery) {
-            setSortQuery(query);
-
-        }
     };
 
     const renderSubject = (record, day) => {
@@ -254,8 +261,9 @@ function ScheduleOfWeek(props) {
         if (!_.isEmpty(subject)) {
             return (
                 <div key={record?.name}>
-                    <p>{subject?.name}</p>
-                    <p>at {subject?.room} abc</p>
+                    <p>{subject?.name} - at {subject?.room} abc</p>
+                    <div><Button size='small'>Meet URL</Button></div>
+                    <div><Button size='small'>EduNext</Button></div>
                 </div>
             );
         }
@@ -269,24 +277,21 @@ function ScheduleOfWeek(props) {
     const fetchSchedule = async () => {
         if (sortQuery) {
             let res = await getAllSchedule(sortQuery);
-            console.log(res.dt);
-        }
-        return;
-        let res = await getAllSchedule();
-        let cloneSchedule = [...slots];
-        if (res && res.dt) {
-            cloneSchedule.forEach(slot => {
-                res.dt.forEach(schedule => {
-                    if (slot.name === schedule.name) {
-                        const foundDay = slot.day.findIndex(item => item.code === schedule.day[0].code);
-                        if (foundDay !== -1) {
-                            slot.day[foundDay].subject = schedule.day[0].subject;
-                        }
+            let cloneSchedule = [...slots];
+            if (res && res.dt) {
+                cloneSchedule.forEach(slot => {
+                    res.dt.forEach(schedule => {
+                        if (slot.name === schedule.name) {
+                            const foundDay = slot.day.findIndex(item => item.code === schedule.day[0].code);
+                            if (foundDay !== -1) {
+                                slot.day[foundDay].subject = schedule.day[0].subject;
+                            }
 
-                    }
+                        }
+                    });
                 });
-            });
-            setScheduleOfWeek(cloneSchedule);
+                setScheduleOfWeek(cloneSchedule);
+            }
         }
     };
 
@@ -319,8 +324,7 @@ function ScheduleOfWeek(props) {
                     <p>Little UK (LUK) thuộc tầng 5 tòa nhà Delta</p>
                 </div>
                 <div>
-                    <DatePicker allowClear={false} defaultValue={dayjs()} format={customWeekStartEndFormat} picker="week" onChange={handleChangeWeek} style={{ cursor: 'pointer' }} />
-                    <Table columns={columns} dataSource={scheduleOfWeek} bordered />
+                    <Table size='small' columns={columns} dataSource={scheduleOfWeek} bordered pagination={false} />
                 </div>
                 <p><span style={{ fontWeight: 'bold' }}>More note / Chú thích thêm</span>:</p>
                 <ul>
