@@ -1,7 +1,13 @@
-import React from 'react';
-import { Breadcrumb, Space, Table } from "antd";
+import React, { useEffect, useState } from 'react';
+import { Breadcrumb, Table, DatePicker, Space } from "antd";
 import { Link } from "react-router-dom";
 import './TimeTable.scss';
+import { getAllSchedule } from '../../services/api';
+import _ from 'lodash';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import dayjs from 'dayjs';
+
+dayjs.extend(customParseFormat);
 
 function ScheduleOfWeek(props) {
     const slots = [
@@ -10,25 +16,25 @@ function ScheduleOfWeek(props) {
             code: "S0",
             day: [
                 {
-                    code: "MON", subject: []
+                    code: "MON", subject: {}
                 },
                 {
-                    code: "TUE", subject: []
+                    code: "TUE", subject: {}
                 },
                 {
-                    code: "WED", subject: []
+                    code: "WED", subject: {}
                 },
                 {
-                    code: "THU", subject: []
+                    code: "THU", subject: {}
                 },
                 {
-                    code: "FRI", subject: []
+                    code: "FRI", subject: {}
                 },
                 {
-                    code: "SAT", subject: []
+                    code: "SAT", subject: {}
                 },
                 {
-                    code: "SUN", subject: []
+                    code: "SUN", subject: {}
                 },
             ]
         },
@@ -37,25 +43,25 @@ function ScheduleOfWeek(props) {
             code: "S1",
             day: [
                 {
-                    code: "MON", subject: []
+                    code: "MON", subject: {}
                 },
                 {
-                    code: "TUE", subject: []
+                    code: "TUE", subject: {}
                 },
                 {
-                    code: "WED", subject: []
+                    code: "WED", subject: {}
                 },
                 {
-                    code: "THU", subject: []
+                    code: "THU", subject: {}
                 },
                 {
-                    code: "FRI", subject: []
+                    code: "FRI", subject: {}
                 },
                 {
-                    code: "SAT", subject: []
+                    code: "SAT", subject: {}
                 },
                 {
-                    code: "SUN", subject: []
+                    code: "SUN", subject: {}
                 },
             ]
         },
@@ -64,25 +70,25 @@ function ScheduleOfWeek(props) {
             code: "S2",
             day: [
                 {
-                    code: "MON", subject: []
+                    code: "MON", subject: {}
                 },
                 {
-                    code: "TUE", subject: []
+                    code: "TUE", subject: {}
                 },
                 {
-                    code: "WED", subject: []
+                    code: "WED", subject: {}
                 },
                 {
-                    code: "THU", subject: []
+                    code: "THU", subject: {}
                 },
                 {
-                    code: "FRI", subject: []
+                    code: "FRI", subject: {}
                 },
                 {
-                    code: "SAT", subject: []
+                    code: "SAT", subject: {}
                 },
                 {
-                    code: "SUN", subject: []
+                    code: "SUN", subject: {}
                 },
             ]
         },
@@ -91,29 +97,25 @@ function ScheduleOfWeek(props) {
             code: "S3",
             day: [
                 {
-                    code: "MON", subject: [
-                        { name: "MLN111", room: "BE-206", slot: "S3" }
-                    ]
+                    code: "MON", subject: {}
                 },
                 {
-                    code: "TUE", subject: [
-                        { name: "PRN231", room: "DE-229", slot: "S3" }
-                    ]
+                    code: "TUE", subject: {}
                 },
                 {
-                    code: "WED", subject: []
+                    code: "WED", subject: {}
                 },
                 {
-                    code: "THU", subject: []
+                    code: "THU", subject: {}
                 },
                 {
-                    code: "FRI", subject: []
+                    code: "FRI", subject: {}
                 },
                 {
-                    code: "SAT", subject: []
+                    code: "SAT", subject: {}
                 },
                 {
-                    code: "SUN", subject: []
+                    code: "SUN", subject: {}
                 },
             ]
         },
@@ -122,33 +124,25 @@ function ScheduleOfWeek(props) {
             code: "S4",
             day: [
                 {
-                    code: "MON", subject: []
+                    code: "MON", subject: {}
                 },
                 {
-                    code: "TUE", subject: []
+                    code: "TUE", subject: {}
                 },
                 {
-                    code: "WED", subject: [
-                        { name: "EXE201", room: "DE-C308", slot: "S4" }
-                    ]
+                    code: "WED", subject: {}
                 },
                 {
-                    code: "THU", subject: [
-                        { name: "MLN111", room: "BE-206", slot: "S4" }
-                    ]
+                    code: "THU", subject: {}
                 },
                 {
-                    code: "FRI", subject: [
-                        { name: "PRN231", room: "DE-229", slot: "S4" }
-                    ]
+                    code: "FRI", subject: {}
                 },
                 {
-                    code: "SAT", subject: [
-                        { name: "WDU203c", room: "DE-212", slot: "S4" }
-                    ]
+                    code: "SAT", subject: {}
                 },
                 {
-                    code: "SUN", subject: []
+                    code: "SUN", subject: {}
                 },
             ]
         },
@@ -157,31 +151,33 @@ function ScheduleOfWeek(props) {
             code: "S5",
             day: [
                 {
-                    code: "MON", subject: []
+                    code: "MON", subject: {}
                 },
                 {
-                    code: "TUE", subject: []
+                    code: "TUE", subject: {}
                 },
                 {
-                    code: "WED", subject: []
+                    code: "WED", subject: {}
                 },
                 {
-                    code: "THU", subject: []
+                    code: "THU", subject: {}
                 },
                 {
-                    code: "FRI", subject: []
+                    code: "FRI", subject: {}
                 },
                 {
-                    code: "SAT", subject: [
-                        { name: "PMG202c", room: "DE-C204" }
-                    ]
+                    code: "SAT", subject: {}
                 },
                 {
-                    code: "SUN", subject: []
+                    code: "SUN", subject: {}
                 },
             ]
         }
     ];
+
+    const [scheduleOfWeek, setScheduleOfWeek] = useState(slots);
+    const [rangeWeek, setRangeWeek] = useState();
+    const [sortQuery, setSortQuery] = useState('');
 
     const columns = [
         {
@@ -193,57 +189,105 @@ function ScheduleOfWeek(props) {
             title: 'MON',
             dataIndex: 'MON',
             key: 'MON',
-            render: (_, record) => rendersubject(record, 'MON'),
+            render: (_, record) => renderSubject(record, 'MON'),
         },
         {
             title: 'TUE',
             dataIndex: 'TUE',
             key: 'TUE',
-            render: (_, record) => rendersubject(record, 'TUE'),
+            render: (_, record) => renderSubject(record, 'TUE'),
         },
         {
             title: 'WED',
             dataIndex: 'WED',
             key: 'WED',
-            render: (_, record) => rendersubject(record, 'WED'),
+            render: (_, record) => renderSubject(record, 'WED'),
         },
         {
             title: 'THU',
             dataIndex: 'THU',
             key: 'THU',
-            render: (_, record) => rendersubject(record, 'THU'),
+            render: (_, record) => renderSubject(record, 'THU'),
         },
         {
             title: 'FRI',
             dataIndex: 'FRI',
             key: 'FRI',
-            render: (_, record) => rendersubject(record, 'FRI'),
+            render: (_, record) => renderSubject(record, 'FRI'),
         },
         {
             title: 'SAT',
             dataIndex: 'SAT',
             key: 'SAT',
-            render: (_, record) => rendersubject(record, 'SAT'),
+            render: (_, record) => renderSubject(record, 'SAT'),
         },
         {
             title: 'SUN',
             dataIndex: 'SUN',
             key: 'SUN',
-            render: (_, record) => rendersubject(record, 'SUN'),
+            render: (_, record) => renderSubject(record, 'SUN'),
         },
     ];
 
-    const rendersubject = (record, day) => {
+    const weekFormat = 'MM/DD';
+
+    const customWeekStartEndFormat = (value) =>
+        `${dayjs(value).startOf('week').format(weekFormat)} - ${dayjs(value)
+            .endOf('week')
+            .format(weekFormat)}`;
+
+    const buildRangeWeek = (year, dates) => {
+        let query = `startDate=${dates[0]}/${year}&endDate=${dates[1]}/${year}`;
+        return query;
+    };
+
+    const handleChangeWeek = (date, dateString) => {
+        let query = buildRangeWeek(date.$d.getFullYear(), dateString.split(' - '));
+        if (query !== sortQuery) {
+            setSortQuery(query);
+
+        }
+    };
+
+    const renderSubject = (record, day) => {
         const subject = record.day.find(item => item.code === day)?.subject;
-        if (subject && subject.length > 0) {
+        if (!_.isEmpty(subject)) {
             return (
-                <div key={record.name}>
-                    <p>{subject[0].name}</p>
-                    <p>at {subject[0].room}</p>
+                <div key={record?.name}>
+                    <p>{subject?.name}</p>
+                    <p>at {subject?.room} abc</p>
                 </div>
             );
         }
-        return '-';
+        return <span key={record?.name}>-</span>;
+    };
+
+    useEffect(() => {
+        fetchSchedule();
+    }, [sortQuery]);
+
+    const fetchSchedule = async () => {
+        if (sortQuery) {
+            let res = await getAllSchedule(sortQuery);
+            console.log(res.dt);
+        }
+        return;
+        let res = await getAllSchedule();
+        let cloneSchedule = [...slots];
+        if (res && res.dt) {
+            cloneSchedule.forEach(slot => {
+                res.dt.forEach(schedule => {
+                    if (slot.name === schedule.name) {
+                        const foundDay = slot.day.findIndex(item => item.code === schedule.day[0].code);
+                        if (foundDay !== -1) {
+                            slot.day[foundDay].subject = schedule.day[0].subject;
+                        }
+
+                    }
+                });
+            });
+            setScheduleOfWeek(cloneSchedule);
+        }
     };
 
     return (
@@ -275,7 +319,8 @@ function ScheduleOfWeek(props) {
                     <p>Little UK (LUK) thuộc tầng 5 tòa nhà Delta</p>
                 </div>
                 <div>
-                    <Table columns={columns} dataSource={slots} bordered />
+                    <DatePicker allowClear={false} defaultValue={dayjs()} format={customWeekStartEndFormat} picker="week" onChange={handleChangeWeek} style={{ cursor: 'pointer' }} />
+                    <Table columns={columns} dataSource={scheduleOfWeek} bordered />
                 </div>
                 <p><span style={{ fontWeight: 'bold' }}>More note / Chú thích thêm</span>:</p>
                 <ul>
