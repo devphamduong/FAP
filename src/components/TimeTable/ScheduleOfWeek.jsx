@@ -163,7 +163,7 @@ function ScheduleOfWeek(props) {
             const courseHasEduNext = record.day.findIndex(item => item.code === day && item.hasEduNext === true);
             return (
                 <>
-                    <p><>{subject?.name}</> - at {record.room}</p>
+                    <p><Link to={`/ActivityDetail/Schedule/${record.id}`}>{subject?.name}</Link> - at {record.room}</p>
                     <div><Button size='small' style={{ color: 'white', fontWeight: 700, backgroundColor: '#777' }}>Meet URL</Button></div>
                     {courseHasEduNext > -1 && record.day[courseHasEduNext] &&
                         <div><Button size='small' style={{ color: 'white', fontWeight: 700, backgroundColor: '#337ab7' }}>EduNext</Button></div>

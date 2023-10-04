@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import ScheduleOfWeek from './components/TimeTable/ScheduleOfWeek';
 import TimeTable from './components/TimeTable/TimeTable';
+import ActivityDetail from './components/ActivityDetail';
 
 const Layout = () => {
   return (
@@ -36,6 +37,10 @@ function App() {
         {
           path: "TimeTable",
           element: <TimeTable />,
+        },
+        {
+          path: "ActivityDetail/:activity/:id",
+          element: <ActivityDetail />,
         }
       ],
     },
