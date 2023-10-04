@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Breadcrumb, Table, DatePicker, Space, Button } from "antd";
+import { Breadcrumb, Table, DatePicker, Space, Button, Typography } from "antd";
 import { Link } from "react-router-dom";
 import './TimeTable.scss';
 import { getAllSchedule } from '../../services/api';
@@ -8,189 +8,62 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import dayjs from 'dayjs';
 import moment from 'moment/moment';
 
+const weekFormat = 'MM/DD';
 dayjs.extend(customParseFormat);
 
+const { Text } = Typography;
+
 function ScheduleOfWeek(props) {
-    const slots = [
-        {
-            name: "Slot 0",
-            code: "S0",
+    const originalSlots = [];
+    for (let i = 0; i <= 12; i++) {
+        const slot = {
+            id: '',
+            name: `Slot ${i}`,
+            code: `S${i}`,
+            duration: '',
+            room: '',
             day: [
                 {
-                    code: "MON", subject: {}
+                    code: "MON", subject: {}, hasEduNext: false
                 },
                 {
-                    code: "TUE", subject: {}
+                    code: "TUE", subject: {}, hasEduNext: false
                 },
                 {
-                    code: "WED", subject: {}
+                    code: "WED", subject: {}, hasEduNext: false
                 },
                 {
-                    code: "THU", subject: {}
+                    code: "THU", subject: {}, hasEduNext: false
                 },
                 {
-                    code: "FRI", subject: {}
+                    code: "FRI", subject: {}, hasEduNext: false
                 },
                 {
-                    code: "SAT", subject: {}
+                    code: "SAT", subject: {}, hasEduNext: false
                 },
                 {
-                    code: "SUN", subject: {}
-                },
-            ]
-        },
-        {
-            name: "Slot 1",
-            code: "S1",
-            day: [
-                {
-                    code: "MON", subject: {}
-                },
-                {
-                    code: "TUE", subject: {}
-                },
-                {
-                    code: "WED", subject: {}
-                },
-                {
-                    code: "THU", subject: {}
-                },
-                {
-                    code: "FRI", subject: {}
-                },
-                {
-                    code: "SAT", subject: {}
-                },
-                {
-                    code: "SUN", subject: {}
-                },
-            ]
-        },
-        {
-            name: "Slot 2",
-            code: "S2",
-            day: [
-                {
-                    code: "MON", subject: {}
-                },
-                {
-                    code: "TUE", subject: {}
-                },
-                {
-                    code: "WED", subject: {}
-                },
-                {
-                    code: "THU", subject: {}
-                },
-                {
-                    code: "FRI", subject: {}
-                },
-                {
-                    code: "SAT", subject: {}
-                },
-                {
-                    code: "SUN", subject: {}
-                },
-            ]
-        },
-        {
-            name: "Slot 3",
-            code: "S3",
-            day: [
-                {
-                    code: "MON", subject: {}
-                },
-                {
-                    code: "TUE", subject: {}
-                },
-                {
-                    code: "WED", subject: {}
-                },
-                {
-                    code: "THU", subject: {}
-                },
-                {
-                    code: "FRI", subject: {}
-                },
-                {
-                    code: "SAT", subject: {}
-                },
-                {
-                    code: "SUN", subject: {}
-                },
-            ]
-        },
-        {
-            name: "Slot 4",
-            code: "S4",
-            day: [
-                {
-                    code: "MON", subject: {}
-                },
-                {
-                    code: "TUE", subject: {}
-                },
-                {
-                    code: "WED", subject: {}
-                },
-                {
-                    code: "THU", subject: {}
-                },
-                {
-                    code: "FRI", subject: {}
-                },
-                {
-                    code: "SAT", subject: {}
-                },
-                {
-                    code: "SUN", subject: {}
-                },
-            ]
-        },
-        {
-            name: "Slot 5",
-            code: "S5",
-            day: [
-                {
-                    code: "MON", subject: {}
-                },
-                {
-                    code: "TUE", subject: {}
-                },
-                {
-                    code: "WED", subject: {}
-                },
-                {
-                    code: "THU", subject: {}
-                },
-                {
-                    code: "FRI", subject: {}
-                },
-                {
-                    code: "SAT", subject: {}
-                },
-                {
-                    code: "SUN", subject: {}
-                },
-            ]
-        }
-    ];
+                    code: "SUN", subject: {}, hasEduNext: false
+                }
+            ],
+        };
+        originalSlots.push(slot);
+    }
+    const slots = [...originalSlots];
 
-    const [scheduleOfWeek, setScheduleOfWeek] = useState(slots);
-    const [rangeWeek, setRangeWeek] = useState();
+    const [scheduleOfWeek, setScheduleOfWeek] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [sortQuery, setSortQuery] = useState(`startDate=${moment().startOf('week').format('MM/DD/YYYY')}&endDate=${moment().endOf('week').format('MM/DD/YYYY')}`);
-
-    const weekFormat = 'MM/DD';
+    const [currentWeek, setCurrentWeek] = useState(moment(moment().endOf('week').format('MM/DD/YYYY'), 'MM/DD/YYYY').isoWeek());
 
     const customWeekStartEndFormat = (value) =>
-        `${dayjs(value).startOf('week').format(weekFormat)} - ${dayjs(value)
-            .endOf('week')
-            .format(weekFormat)}`;
+        `${dayjs(value).startOf('week').format(weekFormat)} - ${dayjs(value).endOf('week').format(weekFormat)}`;
 
     const handleChangeWeek = (date, dateString) => {
         let query = buildRangeWeek(date.$d.getFullYear(), dateString.split(' - '));
         if (query !== sortQuery) {
             setSortQuery(query);
+            let chosenWeek = moment(`${date.$d.getMonth() + 1}/${date.$d.getDate()}/${date.$d.getFullYear()}`, 'MM/DD/YYYY').week();
+            setCurrentWeek(chosenWeek);
         }
     };
 
@@ -208,43 +81,71 @@ function ScheduleOfWeek(props) {
             width: '11%'
         },
         {
-            title: 'MON',
+            title:
+                <>
+                    <p>MON</p>
+                    <span>{moment().day("MON").week(currentWeek).format('MM/DD')}</span>
+                </>,
             dataIndex: 'MON',
             key: 'MON',
             render: (_, record) => renderSubject(record, 'MON'),
         },
         {
-            title: 'TUE',
+            title:
+                <>
+                    <p>TUE</p>
+                    <span>{moment().day("TUE").week(currentWeek).format('MM/DD')}</span>
+                </>,
             dataIndex: 'TUE',
             key: 'TUE',
             render: (_, record) => renderSubject(record, 'TUE'),
         },
         {
-            title: 'WED',
+            title:
+                <>
+                    <p>WED</p>
+                    <span>{moment().day("WED").week(currentWeek).format('MM/DD')}</span>
+                </>,
             dataIndex: 'WED',
             key: 'WED',
             render: (_, record) => renderSubject(record, 'WED'),
         },
         {
-            title: 'THU',
+            title:
+                <>
+                    <p>THU</p>
+                    <span>{moment().day("THU").week(currentWeek).format('MM/DD')}</span>
+                </>,
             dataIndex: 'THU',
             key: 'THU',
             render: (_, record) => renderSubject(record, 'THU'),
         },
         {
-            title: 'FRI',
+            title:
+                <>
+                    <p>FRI</p>
+                    <span>{moment().day("FRI").week(currentWeek).format('MM/DD')}</span>
+                </>,
             dataIndex: 'FRI',
             key: 'FRI',
             render: (_, record) => renderSubject(record, 'FRI'),
         },
         {
-            title: 'SAT',
+            title:
+                <>
+                    <p>SAT</p>
+                    <span>{moment().day("SAT").week(currentWeek).format('MM/DD')}</span>
+                </>,
             dataIndex: 'SAT',
             key: 'SAT',
             render: (_, record) => renderSubject(record, 'SAT'),
         },
         {
-            title: 'SUN',
+            title:
+                <>
+                    <p>SUN</p>
+                    <span>{moment().day("SUN").week(currentWeek + 1).format('MM/DD')}</span>
+                </>,
             dataIndex: 'SUN',
             key: 'SUN',
             render: (_, record) => renderSubject(record, 'SUN'),
@@ -259,15 +160,22 @@ function ScheduleOfWeek(props) {
     const renderSubject = (record, day) => {
         const subject = record.day.find(item => item.code === day)?.subject;
         if (!_.isEmpty(subject)) {
+            const courseHasEduNext = record.day.findIndex(item => item.code === day && item.hasEduNext === true);
             return (
-                <div key={record?.name}>
-                    <p>{subject?.name} - at {subject?.room} abc</p>
-                    <div><Button size='small'>Meet URL</Button></div>
-                    <div><Button size='small'>EduNext</Button></div>
-                </div>
+                <>
+                    <p><>{subject?.name}</> - at {record.room}</p>
+                    <div><Button size='small' style={{ color: 'white', fontWeight: 700, backgroundColor: '#777' }}>Meet URL</Button></div>
+                    {courseHasEduNext > -1 && record.day[courseHasEduNext] &&
+                        <div><Button size='small' style={{ color: 'white', fontWeight: 700, backgroundColor: '#337ab7' }}>EduNext</Button></div>
+                    }
+                    <div>(Not yet)</div>
+                    <Text strong children={
+                        <code style={{ color: 'white', backgroundColor: '#5cb85c' }}>({record.duration})</code>
+                    } />
+                </>
             );
         }
-        return <span key={record?.name}>-</span>;
+        return <>-</>;
     };
 
     useEffect(() => {
@@ -275,16 +183,22 @@ function ScheduleOfWeek(props) {
     }, [sortQuery]);
 
     const fetchSchedule = async () => {
+        setIsLoading(true);
+        setScheduleOfWeek(slots);
         if (sortQuery) {
             let res = await getAllSchedule(sortQuery);
-            let cloneSchedule = [...slots];
-            if (res && res.dt) {
+            if (res && res.dt && res.dt.length > 0) {
+                let cloneSchedule = [...slots];
                 cloneSchedule.forEach(slot => {
                     res.dt.forEach(schedule => {
                         if (slot.name === schedule.name) {
-                            const foundDay = slot.day.findIndex(item => item.code === schedule.day[0].code);
+                            slot.id = schedule.id;
+                            slot.duration = schedule.duration;
+                            slot.room = schedule.room;
+                            const foundDay = slot.day.findIndex(item => item.code === schedule.day.code);
                             if (foundDay !== -1) {
-                                slot.day[foundDay].subject = schedule.day[0].subject;
+                                slot.day[foundDay].subject = schedule.day.subject;
+                                slot.day[foundDay].hasEduNext = schedule.day.hasEduNext;
                             }
 
                         }
@@ -293,6 +207,7 @@ function ScheduleOfWeek(props) {
                 setScheduleOfWeek(cloneSchedule);
             }
         }
+        setIsLoading(false);
     };
 
     return (
@@ -324,7 +239,7 @@ function ScheduleOfWeek(props) {
                     <p>Little UK (LUK) thuộc tầng 5 tòa nhà Delta</p>
                 </div>
                 <div>
-                    <Table size='small' columns={columns} dataSource={scheduleOfWeek} bordered pagination={false} />
+                    <Table rowKey={'name'} loading={isLoading} size='small' columns={columns} dataSource={scheduleOfWeek} bordered pagination={false} />
                 </div>
                 <p><span style={{ fontWeight: 'bold' }}>More note / Chú thích thêm</span>:</p>
                 <ul>
