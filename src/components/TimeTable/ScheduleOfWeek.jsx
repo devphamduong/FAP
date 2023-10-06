@@ -17,7 +17,6 @@ function ScheduleOfWeek(props) {
     const originalSlots = [];
     for (let i = 0; i <= 12; i++) {
         const slot = {
-            id: '',
             name: `Slot ${i}`,
             code: `S${i}`,
             duration: '',
@@ -158,12 +157,13 @@ function ScheduleOfWeek(props) {
     };
 
     const renderSubject = (record, day) => {
+        const schedule = record.day.find(item => item.code === day);
         const subject = record.day.find(item => item.code === day)?.subject;
         if (!_.isEmpty(subject)) {
             const courseHasEduNext = record.day.findIndex(item => item.code === day && item.hasEduNext === true);
             return (
                 <>
-                    <p><Link to={`/ActivityDetail/Schedule/${record.id}`}>{subject?.name}</Link> - at {record.room}</p>
+                    <p><Link to={`/ActivityDetail/Schedule/${schedule.id}`}>{subject?.name}</Link> - at {record.room}</p>
                     <div><Button size='small' style={{ color: 'white', fontWeight: 700, backgroundColor: '#777' }}>Meet URL</Button></div>
                     {courseHasEduNext > -1 && record.day[courseHasEduNext] &&
                         <div><Button size='small' style={{ color: 'white', fontWeight: 700, backgroundColor: '#337ab7' }}>EduNext</Button></div>
@@ -192,11 +192,11 @@ function ScheduleOfWeek(props) {
                 cloneSchedule.forEach(slot => {
                     res.dt.forEach(schedule => {
                         if (slot.name === schedule.name) {
-                            slot.id = schedule.id;
                             slot.duration = schedule.duration;
                             slot.room = schedule.room;
                             const foundDay = slot.day.findIndex(item => item.code === schedule.day.code);
                             if (foundDay !== -1) {
+                                slot.day[foundDay].id = schedule.id;
                                 slot.day[foundDay].subject = schedule.day.subject;
                                 slot.day[foundDay].hasEduNext = schedule.day.hasEduNext;
                             }
