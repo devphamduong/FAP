@@ -1,0 +1,12 @@
+.login-content {
+    height         : 100vh;
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    flex-direction : column;
+
+    .login-name {
+        font-size: 30px;
+        margin   : 30px 0;
+    }
+}

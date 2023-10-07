@@ -9,6 +9,10 @@ import {
 import ScheduleOfWeek from './components/TimeTable/ScheduleOfWeek';
 import TimeTable from './components/TimeTable/TimeTable';
 import ActivityDetail from './components/ActivityDetail';
+import Login from './components/Auth/Login';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Loading from './components/Loading';
 
 const Layout = () => {
   return (
@@ -22,32 +26,56 @@ const Layout = () => {
   );
 };
 
-function App() {
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      { index: true, element: <HomePage /> },
+      {
+        path: "ScheduleOfWeek",
+        element: <ScheduleOfWeek />,
+      },
+      {
+        path: "TimeTable",
+        element: <TimeTable />,
+      },
+      {
+        path: "ActivityDetail/:activity/:id",
+        element: <ActivityDetail />,
+      }
+    ],
+  },
+  {
+    path: "/login",
+    element: <Login />
+  },
+]);
 
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <Layout />,
-      children: [
-        { index: true, element: <HomePage /> },
-        {
-          path: "ScheduleOfWeek",
-          element: <ScheduleOfWeek />,
-        },
-        {
-          path: "TimeTable",
-          element: <TimeTable />,
-        },
-        {
-          path: "ActivityDetail/:activity/:id",
-          element: <ActivityDetail />,
-        }
-      ],
-    },
-  ]);
+function App() {
+  const dispatch = useDispatch();
+  const isLoading = useSelector(state => state.account.isLoading);
+
+  useEffect(() => {
+    fetchAccount();
+  }, []);
+
+  const fetchAccount = async () => {
+    if (window.location.pathname !== '/login' || window.location.pathname !== '/register') {
+      //let res = await getAccount();
+      //if (res && res.data) {
+      //  dispatch(getAccountAction(res.data.user));
+      //}
+    }
+  };
 
   return (
-    <RouterProvider router={router} />
+    <>
+      {!isLoading || window.location.pathname === '/login' || window.location.pathname === '/register'
+        ? <RouterProvider router={router} />
+        : <Loading />}
+    </>
+
   );
 }
 

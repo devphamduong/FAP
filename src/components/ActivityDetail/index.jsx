@@ -1,22 +1,32 @@
-import { Breadcrumb, Descriptions, Image } from "antd";
+import { Breadcrumb, Descriptions, Image, Table } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getScheduleById } from "../../services/api";
+import { getClassById, getScheduleById, getUserById } from "../../services/api";
 import moment from "moment";
 import './ActivityDetail.scss';
 
 function ActivityDetail(props) {
     const { activity, id } = useParams();
     const [scheduleDetail, setScheduleDetail] = useState({});
+    const [userDetail, setUserDetail] = useState({});
+    const [listStudents, setListStudents] = useState([]);
 
     useEffect(() => {
-        fetchScheduleDetail();
+        fetchActivityDetail();
     }, [id]);
 
-    const fetchScheduleDetail = async () => {
-        let res = await getScheduleById(id);
+    const fetchActivityDetail = async () => {
+        let res = activity === "Schedule"
+            ? await getScheduleById(id)
+            : activity === "User"
+                ? await getUserById(id)
+                : await getClassById(id);
         if (res && res.dt) {
-            setScheduleDetail(res.dt);
+            activity === "Schedule"
+                ? setScheduleDetail(res.dt)
+                : activity === "User"
+                    ? setUserDetail(res.dt)
+                    : setListStudents(res.dt);
         }
     };
 
@@ -26,8 +36,7 @@ function ActivityDetail(props) {
                 {
                     key: '1',
                     label: 'Date',
-                    children: moment(scheduleDetail?.date).format("dddd, MM/DD/YYYY"),
-                    span: 1
+                    children: moment(scheduleDetail?.date).format("dddd, MM/DD/YYYY")
                 },
                 {
                     key: '2',
@@ -37,12 +46,12 @@ function ActivityDetail(props) {
                 {
                     key: '3',
                     label: 'Student group',
-                    children: scheduleDetail?.group?.name,
+                    children: <Link to={`/ActivityDetail/Class/${scheduleDetail?.group?.id}`}>{scheduleDetail?.group?.name}</Link>,
                 },
                 {
                     key: '4',
                     label: 'Instructor',
-                    children: <Link to={`/ActivityDetail/User/${scheduleDetail?.teacher?.id}`}>{scheduleDetail?.teacher?.code}</Link>,
+                    children: <Link to={`/ActivityDetail/User/${scheduleDetail?.teacher?.id}`}>{scheduleDetail?.teacher?.username}</Link>,
                 },
                 {
                     key: '5',
@@ -85,14 +94,13 @@ function ActivityDetail(props) {
             [
                 {
                     key: '1',
-                    label: 'Code',
-                    children: 'TienTD17',
-                    span: 1
+                    label: 'User name',
+                    children: userDetail.username
                 },
                 {
                     key: '2',
                     label: 'Full name',
-                    children: 'Tạ Đình Tiến',
+                    children: userDetail.fullName,
                 },
                 {
                     key: '3',
@@ -106,9 +114,37 @@ function ActivityDetail(props) {
                 {
                     key: '4',
                     label: 'Email',
-                    children: 'email',
+                    children: userDetail.email,
                 }
             ];
+
+    const columns = [
+        {
+            title: 'Index',
+            dataIndex: 'key',
+            key: 'key',
+        },
+        {
+            title: 'IMAGE',
+            dataIndex: 'image',
+            key: 'image',
+            render: () =>
+                <Image
+                    width={120}
+                    src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+                />,
+        },
+        {
+            title: 'USER NAME',
+            dataIndex: 'username',
+            key: 'username',
+        },
+        {
+            title: 'FULL NAME',
+            dataIndex: 'fullName',
+            key: 'fullName',
+        }
+    ];
 
     return (
         <div className="activity-detail-container">
@@ -118,20 +154,22 @@ function ActivityDetail(props) {
                         title: <Link to={'/'}>Home</Link>,
                     },
                     {
-                        title: activity === "Schedule" ? 'View' : 'User detail',
+                        title: activity === "Schedule" ? 'View' : activity === "User" ? 'User detail' : 'Class detail',
                     }
                 ]}
             />
             <div className="activity-detail-content" style={{ margin: '15px 0' }}>
                 <>
                     <div style={{ marginBottom: 40 }}>
-                        <span style={{ fontSize: 30 }}>{activity === "Schedule" ? "Activity Detail" : "User detail"}</span>
+                        <span style={{ fontSize: 30 }}>{activity === "Schedule" ? "Activity Detail" : activity === "User" ? 'User detail' : 'Class detail'}</span>
                     </div>
                     {activity === "Schedule"
                         ? <Descriptions column={1} size={'small'} bordered items={items} />
                         :
-                        activity === "User" &&
-                        <Descriptions column={1} size={'small'} bordered items={items} />
+                        activity === "User"
+                            ? <Descriptions column={1} size={'small'} bordered items={items} />
+                            :
+                            <Table size='small' columns={columns} dataSource={listStudents} pagination={false} />
                     }
                 </>
             </div>
