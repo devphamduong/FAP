@@ -4,6 +4,10 @@ export const getAllSchedule = (query) => {
     return axios.get(`/api/v1/schedule?${query}`);
 };
 
+export const getAllScheduleForTeacher = (query) => {
+    return axios.get(`/api/v1/schedule/teacher?${query}`);
+};
+
 export const getScheduleById = (id) => {
     return axios.get(`/api/v1/schedule/detail?id=${id}`);
 };
@@ -17,5 +21,9 @@ export const getClassById = (id) => {
 };
 
 export const login = (data) => {
-    return axios.post(`/api/v1/auth`, { ...data });
+    return axios.post(`/api/v1/auth/login`, { ...data });
+};
+
+export const register = (data) => {
+    return axios.post(`/api/v1/auth/register`, { ...data });
 };

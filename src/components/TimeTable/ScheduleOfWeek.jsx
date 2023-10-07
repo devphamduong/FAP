@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Breadcrumb, Table, DatePicker, Space, Button, Typography } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import './TimeTable.scss';
 import { getAllSchedule } from '../../services/api';
 import _ from 'lodash';
@@ -14,6 +14,7 @@ dayjs.extend(customParseFormat);
 const { Text } = Typography;
 
 function ScheduleOfWeek(props) {
+    const navigate = useNavigate();
     const originalSlots = [];
     for (let i = 0; i <= 12; i++) {
         const slot = {
@@ -238,6 +239,7 @@ function ScheduleOfWeek(props) {
                     <p>Các phòng bắt đầu bằng DE thuộc tòa nhà Delta. VD: DE,..</p>
                     <p>Little UK (LUK) thuộc tầng 5 tòa nhà Delta</p>
                 </div>
+                <Button onClick={() => navigate('/Teacher/ChangeSlot')}>Change slot</Button>
                 <div>
                     <Table rowKey={'name'} loading={isLoading} size='small' columns={columns} dataSource={scheduleOfWeek} bordered pagination={false} />
                 </div>

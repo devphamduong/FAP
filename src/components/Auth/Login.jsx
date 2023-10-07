@@ -1,9 +1,9 @@
-import { Button, Form, Input, message, notification } from "antd";
+import { Button, Divider, Form, Input, message, notification } from "antd";
 import './Auth.scss';
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { login } from '../../services/api';
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAction } from "../../redux/account/accountSlice";
 
@@ -32,7 +32,7 @@ function Login() {
     };
 
     return (
-        <div className="login-container">
+        <div className="auth-container">
             <div className="login-content">
                 <span className="login-name">FPT University Academic Portal</span>
                 <Form
@@ -56,9 +56,15 @@ function Login() {
 
                     <Form.Item>
                         <Button loading={isLoading} style={{ width: '100%' }} type="primary" shape="round" htmlType="submit" className="login-form-button">
-                            Login
+                            Log In
                         </Button>
                     </Form.Item>
+                    <Divider>Or</Divider>
+                    <p>Don't have an account?
+                        <span>
+                            <Link to={'/register'}> Sign Up</Link>
+                        </span>
+                    </p>
                 </Form>
             </div>
         </div>

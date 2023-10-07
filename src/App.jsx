@@ -13,6 +13,8 @@ import Login from './components/Auth/Login';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Loading from './components/Loading';
+import Register from './components/Auth/Register';
+import ChangeSlot from './components/Teacher/ChangeSlot';
 
 const Layout = () => {
   return (
@@ -43,12 +45,20 @@ const router = createBrowserRouter([
       {
         path: "ActivityDetail/:activity/:id",
         element: <ActivityDetail />,
+      },
+      {
+        path: "Teacher/ChangeSlot",
+        element: <ChangeSlot />,
       }
     ],
   },
   {
     path: "/login",
     element: <Login />
+  },
+  {
+    path: "/register",
+    element: <Register />
   },
 ]);
 
@@ -71,9 +81,10 @@ function App() {
 
   return (
     <>
-      {!isLoading || window.location.pathname === '/login' || window.location.pathname === '/register'
+      {/* {!isLoading || window.location.pathname === '/login' || window.location.pathname === '/register'
         ? <RouterProvider router={router} />
-        : <Loading />}
+        : <Loading />} */}
+      <RouterProvider router={router} />
     </>
 
   );

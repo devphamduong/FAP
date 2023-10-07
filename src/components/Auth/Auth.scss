@@ -1,12 +1,17 @@
-.login-content {
-    height         : 100vh;
-    display        : flex;
-    align-items    : center;
-    justify-content: center;
-    flex-direction : column;
+.auth-container {
 
-    .login-name {
-        font-size: 30px;
-        margin   : 30px 0;
+    .login-content,
+    .register-content {
+        height         : 100vh;
+        display        : flex;
+        align-items    : center;
+        justify-content: center;
+        flex-direction : column;
+
+        .login-name,
+        .register-name {
+            font-size: 30px;
+            margin   : 30px 0;
+        }
     }
 }
