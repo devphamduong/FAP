@@ -53,11 +53,11 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/login",
+    path: "/Login",
     element: <Login />
   },
   {
-    path: "/register",
+    path: "/Register",
     element: <Register />
   },
 ]);
@@ -71,7 +71,7 @@ function App() {
   }, []);
 
   const fetchAccount = async () => {
-    if (window.location.pathname !== '/login' || window.location.pathname !== '/register') {
+    if (window.location.pathname !== '/Login' || window.location.pathname !== '/Register') {
       //let res = await getAccount();
       //if (res && res.data) {
       //  dispatch(getAccountAction(res.data.user));

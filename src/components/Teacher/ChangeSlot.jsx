@@ -1,8 +1,9 @@
-import { Breadcrumb, Button, Collapse, Space } from "antd";
+import { Breadcrumb, Button, Collapse, Descriptions, Space } from "antd";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllScheduleForTeacher } from "../../services/api";
 import { useImmer } from "use-immer";
+import moment from "moment";
 
 function ChangeSlot(props) {
     const [listSchedules, setListSchedules] = useState([]);
@@ -22,19 +23,39 @@ function ChangeSlot(props) {
     };
 
     useEffect(() => {
-
-        const subjectSet = new Set();
+        const subjectSet = [];
         if (listSchedules.length > 0) {
             listSchedules.map((item, index) => {
-                if (!subjectSet.has(item.day.subject.name)) {
-                    subjectSet.add(item.day.subject.name);
+                if (!subjectSet.includes(item.day.subject.name)) {
+                    subjectSet.push(item.day.subject.name);
                     setListCourses(draft => {
                         draft[index] = {
                             subject: item.day.subject.name,
                             date: item.date,
                             scheduleId: item.id,
-                            slot: item.name
+                            slot: item.name,
+                            schedule: [
+                                {
+                                    scheduleId: item.id,
+                                    date: item.date,
+                                    slot: item.name,
+                                    code: item.code
+                                }
+                            ]
                         };
+                    });
+                } else {
+                    const foundCourse = subjectSet.findIndex(subject => subject === item.day.subject.name);
+                    setListCourses(draft => {
+                        draft[foundCourse].schedule = [
+                            ...draft[foundCourse].schedule,
+                            {
+                                scheduleId: item.id,
+                                date: item.date,
+                                slot: item.name,
+                                code: item.code
+                            }
+                        ];
                     });
                 }
             });
@@ -54,12 +75,40 @@ function ChangeSlot(props) {
                 ]}
             />
             <div className="change-slot-content">
-                <Space direction="vertical">
+                <Space direction="vertical" style={{ width: '100%' }}>
                     {listCourses && listCourses.length > 0 &&
-                        listCourses.map((item, index) => {
+                        listCourses.map((itemC, index) => {
                             return (
-                                <Collapse key={`course-${item.subject}`}
-                                    items={[{ key: index, label: <>{item.subject}</>, children: <p>{item.date} - {item.slot}</p> }]}
+                                <Collapse key={`course-${itemC.subject}`}
+                                    items={[
+                                        {
+                                            key: index,
+                                            label: <>{itemC.subject}</>,
+                                            children:
+                                                <Space direction="vertical">
+                                                    {
+                                                        itemC.schedule.map(itemS => {
+                                                            return (
+                                                                <>
+                                                                    <Descriptions column={2} size={'small'} bordered items={[
+                                                                        {
+                                                                            key: index,
+                                                                            label: 'Date',
+                                                                            children: moment(itemS.date).format("MMMM DD YYYY")
+                                                                        },
+                                                                        {
+                                                                            key: index + 1,
+                                                                            label: 'Slot',
+                                                                            children: itemS.code.substring(1)
+                                                                        }
+                                                                    ]} />
+                                                                </>
+                                                            );
+                                                        })
+                                                    }
+                                                </Space>
+                                        }
+                                    ]}
                                 />
                             );
                         })

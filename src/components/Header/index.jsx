@@ -1,9 +1,12 @@
 import { useSelector } from 'react-redux';
 import './Header.scss';
 import { Col, Row, Tag } from "antd";
+import { useNavigate } from 'react-router-dom';
 
 function Header(props) {
     const user = useSelector(state => state.account.user);
+    const isAuthenticated = useSelector(state => state.account.isAuthenticated);
+    const navigate = useNavigate();
 
     return (
         <>
@@ -15,8 +18,11 @@ function Header(props) {
                 </Col>
                 <Col span={12}>
                     <Row align={'middle'} justify={'end'}>
-                        <Col><Tag color="#87d068">{user?.username}</Tag></Col>
-                        <Col><Tag color="#87d068">logout</Tag></Col>
+                        {isAuthenticated && user?.username && <Col><Tag color="#87d068">{user?.username}</Tag></Col>}
+                        {isAuthenticated
+                            ? <Col><Tag color="#87d068" style={{ cursor: 'pointer' }} onClick={() => navigate('/Logout')}>Logout</Tag></Col>
+                            : <Col><Tag color="#87d068" style={{ cursor: 'pointer' }} onClick={() => navigate('/Login')}>Login</Tag></Col>
+                        }
                         <Col><Tag color="#87d068">CAMPUS: FPTU-Hòa Lạc</Tag></Col>
                     </Row>
                 </Col>

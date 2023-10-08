@@ -62,7 +62,7 @@ function Login() {
                     <Divider>Or</Divider>
                     <p>Don't have an account?
                         <span>
-                            <Link to={'/register'}> Sign Up</Link>
+                            <Link to={'/Register'}> Sign Up</Link>
                         </span>
                     </p>
                 </Form>

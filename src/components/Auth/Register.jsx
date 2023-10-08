@@ -99,7 +99,7 @@ function Register(props) {
                     <Divider>Or</Divider>
                     <p>Already have an account?
                         <span>
-                            <Link to={'/login'}> Log In</Link>
+                            <Link to={'/Login'}> Log In</Link>
                         </span>
                     </p>
                 </Form>
