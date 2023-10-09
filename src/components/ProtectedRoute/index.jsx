@@ -24,7 +24,7 @@ function ProtectedRoute(props) {
         <>
             {isAuthenticated
                 ? <RoleBaseRoute>{props.children}</RoleBaseRoute>
-                : <Navigate to={'/login'} replace />
+                : <Navigate to={'/Login'} replace />
             }
         </>
     );

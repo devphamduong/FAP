@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loading from './components/Loading';
 import Register from './components/Auth/Register';
 import ChangeSlot from './components/Teacher/ChangeSlot';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const Layout = () => {
   return (
@@ -36,7 +37,8 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       {
         path: "ScheduleOfWeek",
-        element: <ScheduleOfWeek />,
+        element:
+          <ScheduleOfWeek />,
       },
       {
         path: "TimeTable",
@@ -48,7 +50,10 @@ const router = createBrowserRouter([
       },
       {
         path: "Teacher/ChangeSlot",
-        element: <ChangeSlot />,
+        element:
+          <ProtectedRoute>
+            <ChangeSlot />
+          </ProtectedRoute>,
       }
     ],
   },

@@ -7,6 +7,7 @@ import _ from 'lodash';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import dayjs from 'dayjs';
 import moment from 'moment/moment';
+import { useSelector } from 'react-redux';
 
 const weekFormat = 'MM/DD';
 dayjs.extend(customParseFormat);
@@ -15,6 +16,8 @@ const { Text } = Typography;
 
 function ScheduleOfWeek(props) {
     const navigate = useNavigate();
+    const user = useSelector(state => state.account.user);
+    const isAuthenticated = useSelector(state => state.account.isAuthenticated);
     const originalSlots = [];
     for (let i = 0; i <= 12; i++) {
         const slot = {
@@ -180,6 +183,12 @@ function ScheduleOfWeek(props) {
     };
 
     useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login');
+        }
+    }, []);
+
+    useEffect(() => {
         fetchSchedule();
     }, [sortQuery]);
 
@@ -225,7 +234,7 @@ function ScheduleOfWeek(props) {
             />
             <div className="schedule-content">
                 <div>
-                    <span className="schedule-of-account">Activities for duongpche163153 (Phạm Chu Dương)</span>
+                    <span className="schedule-of-account">Activities for {user?.username} ({user?.fullName})</span>
                 </div>
                 <Space direction="vertical" style={{ marginTop: '10px' }}>
                     <p><span style={{ fontWeight: 'bold' }}>Note</span>: These activities do not include extra-curriculum activities, such as club activities ...</p>

@@ -1,24 +1,40 @@
-import { Breadcrumb, Button, Collapse, Descriptions, Space } from "antd";
+import { Breadcrumb, Button, Col, Collapse, DatePicker, Descriptions, Row, Select, Space, notification } from "antd";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getAllScheduleForTeacher } from "../../services/api";
+import { getAllScheduleForTeacher, getAllSlot, updateSchedule } from "../../services/api";
 import { useImmer } from "use-immer";
 import moment from "moment";
+import _ from "lodash";
+import { useSelector } from "react-redux";
+
+const dateFormatList = "MM/DD/YYYY";
 
 function ChangeSlot(props) {
+    const user = useSelector(state => state.account.user);
+    const [isLoading, setIsLoading] = useState(false);
     const [listSchedules, setListSchedules] = useState([]);
     const [listCourses, setListCourses] = useImmer([]);
+    const [listSlots, setListSlots] = useState([]);
+    const [dateChange, setDateChange] = useState();
+    const [dayChange, setDayChange] = useState();
+    const [slotChange, setSlotChange] = useState();
 
     useEffect(() => {
         fetchAllScheduleForTeacher();
+        fetchAllCode();
     }, []);
 
     const fetchAllScheduleForTeacher = async () => {
-        //FIX WHEN YOUR DONE
-        let res = await getAllScheduleForTeacher('startDate=abc&teacherId=2');
+        let res = await getAllScheduleForTeacher(`startDate=${moment().format('YYYY/MM/DD')}&teacherId=${user.id}`);
         if (res && res.dt) {
             setListSchedules(res.dt);
+        }
+    };
 
+    const fetchAllCode = async () => {
+        let res = await getAllSlot();
+        if (res && res.dt) {
+            setListSlots(res.dt);
         }
     };
 
@@ -39,7 +55,8 @@ function ChangeSlot(props) {
                                     scheduleId: item.id,
                                     date: item.date,
                                     slot: item.name,
-                                    code: item.code
+                                    code: item.code,
+                                    day: item.day.code
                                 }
                             ]
                         };
@@ -53,7 +70,8 @@ function ChangeSlot(props) {
                                 scheduleId: item.id,
                                 date: item.date,
                                 slot: item.name,
-                                code: item.code
+                                code: item.code,
+                                day: item.day.code
                             }
                         ];
                     });
@@ -61,6 +79,52 @@ function ChangeSlot(props) {
             });
         }
     }, [listSchedules]);
+
+    const onChange = (date, dateString) => {
+        setDateChange(dateString);
+    };
+
+    const handleChangeSlot = (value) => {
+        setSlotChange(value);
+    };
+
+    const handleChangeSchedule = async (scheduleId) => {
+        const dateString = dateChange;
+        const date = new Date(dateString);
+        const weekday = date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+        if (!dateChange || !slotChange) {
+            notification.error({
+                message: "An error occurred",
+                description: "Empty inputs",
+                duration: 5
+            });
+            return;
+        }
+        setIsLoading(true);
+        let res = await updateSchedule({
+            scheduleId,
+            date: dateChange,
+            day: weekday,
+            slot: slotChange
+        });
+        if (res && +res.ec === 0) {
+            notification.success({
+                message: "Update successfully",
+                description: res.em,
+                duration: 5
+            });
+            setDateChange('');
+            setSlotChange('');
+            await fetchAllScheduleForTeacher();
+        } else {
+            notification.error({
+                message: "An error occurred",
+                description: res.em,
+                duration: 5
+            });
+        }
+        setIsLoading(false);
+    };
 
     return (
         <div className="change-slot-container">
@@ -89,20 +153,49 @@ function ChangeSlot(props) {
                                                     {
                                                         itemC.schedule.map(itemS => {
                                                             return (
-                                                                <>
-                                                                    <Descriptions column={2} size={'small'} bordered items={[
-                                                                        {
-                                                                            key: index,
-                                                                            label: 'Date',
-                                                                            children: moment(itemS.date).format("MMMM DD YYYY")
-                                                                        },
-                                                                        {
-                                                                            key: index + 1,
-                                                                            label: 'Slot',
-                                                                            children: itemS.code.substring(1)
-                                                                        }
-                                                                    ]} />
-                                                                </>
+                                                                <Row align={'middle'} key={`Schedule-${itemS.scheduleId}`}>
+                                                                    <Col>
+                                                                        <Descriptions column={2} size={'small'} bordered items={[
+                                                                            {
+                                                                                key: index,
+                                                                                label: 'Date',
+                                                                                children: moment(itemS.date).format("MMMM DD YYYY")
+                                                                            },
+                                                                            {
+                                                                                key: index + 1,
+                                                                                label: 'Slot',
+                                                                                children: itemS.code.substring(1)
+                                                                            }
+                                                                        ]} />
+                                                                    </Col>
+                                                                    <Col>to</Col>
+                                                                    <Col>
+                                                                        <Row>
+                                                                            <Col>
+                                                                                <DatePicker disabledDate={d => !d || d.isBefore(moment().subtract(1, 'day'))} allowClear={false} onChange={onChange} format={dateFormatList} style={{ cursor: 'pointer' }} />
+                                                                            </Col>
+                                                                            <Col>
+                                                                                <Select
+                                                                                    placeholder="Select a slot"
+                                                                                    style={{ width: 120 }}
+                                                                                    onChange={handleChangeSlot}>
+                                                                                    {
+                                                                                        listSlots && listSlots.length > 0 &&
+                                                                                        listSlots.map((item, index) => {
+                                                                                            return (
+                                                                                                <Select.Option key={index} value={item.code1} disabled={itemS.code === item.code1}>
+                                                                                                    {item.description}
+                                                                                                </Select.Option>
+                                                                                            );
+                                                                                        })
+                                                                                    }
+
+                                                                                </Select>
+                                                                            </Col>
+                                                                            <Col><Button type="primary" loading={isLoading} onClick={() => handleChangeSchedule(itemS.scheduleId)}>Change</Button></Col>
+                                                                        </Row>
+                                                                    </Col>
+                                                                </Row>
                                                             );
                                                         })
                                                     }

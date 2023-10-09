@@ -27,3 +27,11 @@ export const login = (data) => {
 export const register = (data) => {
     return axios.post(`/api/v1/auth/register`, { ...data });
 };
+
+export const getAllSlot = () => {
+    return axios.get(`/api/v1/code`);
+};
+
+export const updateSchedule = (data) => {
+    return axios.put(`/api/v1/schedule`, { ...data });
+};
