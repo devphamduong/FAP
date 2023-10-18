@@ -55,7 +55,7 @@ function ScheduleOfWeek(props) {
 
     const [scheduleOfWeek, setScheduleOfWeek] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [sortQuery, setSortQuery] = useState(`startDate=${moment().startOf('week').format('MM/DD/YYYY')}&endDate=${moment().endOf('week').format('MM/DD/YYYY')}`);
+    const [sortQuery, setSortQuery] = useState(`userId=${user.id}&startDate=${moment().startOf('week').format('MM/DD/YYYY')}&endDate=${moment().endOf('week').format('MM/DD/YYYY')}`);
     const [currentWeek, setCurrentWeek] = useState(moment(moment().endOf('week').format('MM/DD/YYYY'), 'MM/DD/YYYY').isoWeek());
 
     const customWeekStartEndFormat = (value) =>
@@ -156,7 +156,7 @@ function ScheduleOfWeek(props) {
     ];
 
     const buildRangeWeek = (year, dates) => {
-        let query = `startDate=${dates[0]}/${year}&endDate=${dates[1]}/${year}`;
+        let query = `userId=${user.id}&startDate=${dates[0]}/${year}&endDate=${dates[1]}/${year}`;
         return query;
     };
 

@@ -29,7 +29,7 @@ export const register = (data) => {
 };
 
 export const getAllSlot = () => {
-    return axios.get(`/api/v1/code`);
+    return axios.get(`/api/v1/code/slot`);
 };
 
 export const updateSchedule = (data) => {

@@ -16,8 +16,8 @@ function ChangeSlot(props) {
     const [listCourses, setListCourses] = useImmer([]);
     const [listSlots, setListSlots] = useState([]);
     const [dateChange, setDateChange] = useState();
-    const [dayChange, setDayChange] = useState();
     const [slotChange, setSlotChange] = useState();
+    const [query, setQuery] = useState(`startDate=${moment().format('YYYY/MM/DD')}&teacherId=${user.id}`);
 
     useEffect(() => {
         fetchAllScheduleForTeacher();
@@ -25,7 +25,7 @@ function ChangeSlot(props) {
     }, []);
 
     const fetchAllScheduleForTeacher = async () => {
-        let res = await getAllScheduleForTeacher(`startDate=${moment().format('YYYY/MM/DD')}&teacherId=${user.id}`);
+        let res = await getAllScheduleForTeacher(query);
         if (res && res.dt) {
             setListSchedules(res.dt);
         }
@@ -47,9 +47,6 @@ function ChangeSlot(props) {
                     setListCourses(draft => {
                         draft[index] = {
                             subject: item.day.subject.name,
-                            date: item.date,
-                            scheduleId: item.id,
-                            slot: item.name,
                             schedule: [
                                 {
                                     scheduleId: item.id,
@@ -88,6 +85,35 @@ function ChangeSlot(props) {
         setSlotChange(value);
     };
 
+    const checkChangeSlot = (slot, arrSlot) => {
+        const currentDate = moment().format('MM/DD/YYYY');
+        const currentTime = moment().format('HH:mm');
+        const foundSlot = arrSlot.find(item => item.code1 === slot);
+        const durationFrom = moment(foundSlot.time[0].duration.split('-')[0], 'HH:mm')._i;
+        const durationTo = moment(foundSlot.time[0].duration.split('-')[1], 'HH:mm')._i;
+        // console.log(currentTime);
+        // console.log(durationFrom, durationTo);
+        // console.log(durationFrom <= currentTime, durationTo <= currentTime);
+        if (dateChange === currentDate) {
+            if (currentTime >= durationFrom && currentTime >= durationTo) {
+                notification.error({
+                    message: "An error occurred",
+                    description: `Slot ${slot.substring(1)} ended at ${durationTo}. You can only switch to later slots.`,
+                    duration: 5
+                });
+                return false;
+            } else if (currentTime >= durationFrom && currentTime < durationTo) {
+                notification.error({
+                    message: "An error occurred",
+                    description: `Class started ${moment(durationFrom, 'HH:mm').startOf('hour').fromNow()}. You can only switch to later slots.`,
+                    duration: 5
+                });
+                return false;
+            }
+        }
+        return true;
+    };
+    console.log(listSlots);
     const handleChangeSchedule = async (scheduleId) => {
         const dateString = dateChange;
         const date = new Date(dateString);
@@ -101,27 +127,30 @@ function ChangeSlot(props) {
             return;
         }
         setIsLoading(true);
-        let res = await updateSchedule({
-            scheduleId,
-            date: dateChange,
-            day: weekday,
-            slot: slotChange
-        });
-        if (res && +res.ec === 0) {
-            notification.success({
-                message: "Update successfully",
-                description: res.em,
-                duration: 5
+        let isValid = checkChangeSlot(slotChange, listSlots);
+        if (isValid) {
+            let res = await updateSchedule({
+                scheduleId,
+                date: dateChange,
+                day: weekday,
+                slot: slotChange
             });
-            setDateChange('');
-            setSlotChange('');
-            await fetchAllScheduleForTeacher();
-        } else {
-            notification.error({
-                message: "An error occurred",
-                description: res.em,
-                duration: 5
-            });
+            if (res && +res.ec === 0) {
+                notification.success({
+                    message: "Update successfully",
+                    description: res.em,
+                    duration: 5
+                });
+                setDateChange('');
+                setSlotChange('');
+                await fetchAllScheduleForTeacher();
+            } else {
+                notification.error({
+                    message: "An error occurred",
+                    description: res.em,
+                    duration: 5
+                });
+            }
         }
         setIsLoading(false);
     };
@@ -172,7 +201,7 @@ function ChangeSlot(props) {
                                                                     <Col>
                                                                         <Row>
                                                                             <Col>
-                                                                                <DatePicker disabledDate={d => !d || d.isBefore(moment().subtract(1, 'day'))} allowClear={false} onChange={onChange} format={dateFormatList} style={{ cursor: 'pointer' }} />
+                                                                                <DatePicker disabledDate={d => !d || d.isBefore(moment(itemS.date, 'YYYY-MM-DD'))} allowClear={false} onChange={onChange} format={dateFormatList} style={{ cursor: 'pointer' }} />
                                                                             </Col>
                                                                             <Col>
                                                                                 <Select
@@ -183,7 +212,7 @@ function ChangeSlot(props) {
                                                                                         listSlots && listSlots.length > 0 &&
                                                                                         listSlots.map((item, index) => {
                                                                                             return (
-                                                                                                <Select.Option key={index} value={item.code1} disabled={itemS.code === item.code1}>
+                                                                                                <Select.Option key={index} value={item.code1}>
                                                                                                     {item.description}
                                                                                                 </Select.Option>
                                                                                             );
