@@ -1,4 +1,4 @@
-import { Breadcrumb, Button, Col, Collapse, DatePicker, Descriptions, Row, Select, Space, notification } from "antd";
+import { Breadcrumb, Button, Col, Collapse, DatePicker, Descriptions, Form, Row, Select, Space, notification } from "antd";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllScheduleForTeacher, getAllSlot, updateSchedule } from "../../services/api";
@@ -6,6 +6,7 @@ import { useImmer } from "use-immer";
 import moment from "moment";
 import _ from "lodash";
 import { useSelector } from "react-redux";
+import { MdPublishedWithChanges } from 'react-icons/md';
 
 const dateFormatList = "MM/DD/YYYY";
 
@@ -18,10 +19,11 @@ function ChangeSlot(props) {
     const [dateChange, setDateChange] = useState();
     const [slotChange, setSlotChange] = useState();
     const [query, setQuery] = useState(`startDate=${moment().format('YYYY/MM/DD')}&teacherId=${user.id}`);
+    const [form] = Form.useForm();
 
     useEffect(() => {
         fetchAllScheduleForTeacher();
-        fetchAllCode();
+        fetchAllSlot();
     }, []);
 
     const fetchAllScheduleForTeacher = async () => {
@@ -31,7 +33,7 @@ function ChangeSlot(props) {
         }
     };
 
-    const fetchAllCode = async () => {
+    const fetchAllSlot = async () => {
         let res = await getAllSlot();
         if (res && res.dt) {
             setListSlots(res.dt);
@@ -126,7 +128,6 @@ function ChangeSlot(props) {
             });
             return;
         }
-        setIsLoading(true);
         let isValid = checkChangeSlot(slotChange, listSlots);
         if (isValid) {
             let res = await updateSchedule({
@@ -143,6 +144,7 @@ function ChangeSlot(props) {
                 });
                 setDateChange('');
                 setSlotChange('');
+                form.resetFields();
                 await fetchAllScheduleForTeacher();
             } else {
                 notification.error({
@@ -152,7 +154,6 @@ function ChangeSlot(props) {
                 });
             }
         }
-        setIsLoading(false);
     };
 
     return (
@@ -178,7 +179,7 @@ function ChangeSlot(props) {
                                             key: index,
                                             label: <>{itemC.subject}</>,
                                             children:
-                                                <Space direction="vertical">
+                                                <Space direction="vertical" style={{ width: '100%' }}>
                                                     {
                                                         itemC.schedule.map(itemS => {
                                                             return (
@@ -197,13 +198,13 @@ function ChangeSlot(props) {
                                                                             }
                                                                         ]} />
                                                                     </Col>
-                                                                    <Col>to</Col>
+                                                                    <Col><div style={{ display: 'flex', justifyContent: 'center' }}><MdPublishedWithChanges style={{ fontSize: 20 }} /></div></Col>
                                                                     <Col>
-                                                                        <Row>
-                                                                            <Col>
+                                                                        <Form form={form} layout="inline" style={{ justifyContent: 'center' }}>
+                                                                            <Form.Item name='date'>
                                                                                 <DatePicker disabledDate={d => !d || d.isBefore(moment(itemS.date, 'YYYY-MM-DD'))} allowClear={false} onChange={onChange} format={dateFormatList} style={{ cursor: 'pointer' }} />
-                                                                            </Col>
-                                                                            <Col>
+                                                                            </Form.Item>
+                                                                            <Form.Item name='slot'>
                                                                                 <Select
                                                                                     placeholder="Select a slot"
                                                                                     style={{ width: 120 }}
@@ -220,9 +221,9 @@ function ChangeSlot(props) {
                                                                                     }
 
                                                                                 </Select>
-                                                                            </Col>
-                                                                            <Col><Button type="primary" loading={isLoading} onClick={() => handleChangeSchedule(itemS.scheduleId)}>Change</Button></Col>
-                                                                        </Row>
+                                                                            </Form.Item>
+                                                                            <Col><Button type="primary" onClick={() => handleChangeSchedule(itemS.scheduleId)}>Change</Button></Col>
+                                                                        </Form>
                                                                     </Col>
                                                                 </Row>
                                                             );

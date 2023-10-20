@@ -285,7 +285,9 @@ function ScheduleOfWeek(props) {
                     <p>Các phòng bắt đầu bằng DE thuộc tòa nhà Delta. VD: DE,..</p>
                     <p>Little UK (LUK) thuộc tầng 5 tòa nhà Delta</p>
                 </div>
-                <Button onClick={() => navigate('/Teacher/ChangeSlot')}>Change slot</Button>
+                {user.role === 'TEACHER' &&
+                    <Button onClick={() => navigate('/Teacher/ChangeSlot')} style={{ margin: '5px 0 20px 0' }}>Change slot</Button>
+                }
                 <div>
                     <Table rowKey={'name'} loading={isLoading} size='small' columns={columns} dataSource={scheduleOfWeek} bordered pagination={false} />
                 </div>
