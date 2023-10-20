@@ -113,7 +113,7 @@ function ChangeSlot(props) {
         }
         return true;
     };
-    console.log(listSlots);
+
     const handleChangeSchedule = async (scheduleId) => {
         const dateString = dateChange;
         const date = new Date(dateString);

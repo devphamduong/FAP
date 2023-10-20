@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Breadcrumb, Table, DatePicker, Space, Button, Typography } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import './TimeTable.scss';
-import { getAllSchedule } from '../../services/api';
+import { getAllSchedule, getAllSlot } from '../../services/api';
 import _ from 'lodash';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import dayjs from 'dayjs';
@@ -18,40 +18,40 @@ function ScheduleOfWeek(props) {
     const navigate = useNavigate();
     const user = useSelector(state => state.account.user);
     const isAuthenticated = useSelector(state => state.account.isAuthenticated);
-    const originalSlots = [];
-    for (let i = 0; i <= 12; i++) {
-        const slot = {
-            name: `Slot ${i}`,
-            code: `S${i}`,
-            duration: '',
-            room: '',
-            day: [
-                {
-                    code: "MON", subject: {}, hasEduNext: false
-                },
-                {
-                    code: "TUE", subject: {}, hasEduNext: false
-                },
-                {
-                    code: "WED", subject: {}, hasEduNext: false
-                },
-                {
-                    code: "THU", subject: {}, hasEduNext: false
-                },
-                {
-                    code: "FRI", subject: {}, hasEduNext: false
-                },
-                {
-                    code: "SAT", subject: {}, hasEduNext: false
-                },
-                {
-                    code: "SUN", subject: {}, hasEduNext: false
-                }
-            ],
-        };
-        originalSlots.push(slot);
-    }
-    const slots = [...originalSlots];
+
+    // const originalSlots = [];
+    // for (let i = 0; i <= 12; i++) {
+    //     const slot = {
+    //         name: `Slot ${i}`,
+    //         code: `S${i}`,
+    //         duration: '',
+    //         room: '',
+    //         day: [
+    //             {
+    //                 code: "MON", subject: {}, hasEduNext: false
+    //             },
+    //             {
+    //                 code: "TUE", subject: {}, hasEduNext: false
+    //             },
+    //             {
+    //                 code: "WED", subject: {}, hasEduNext: false
+    //             },
+    //             {
+    //                 code: "THU", subject: {}, hasEduNext: false
+    //             },
+    //             {
+    //                 code: "FRI", subject: {}, hasEduNext: false
+    //             },
+    //             {
+    //                 code: "SAT", subject: {}, hasEduNext: false
+    //             },
+    //             {
+    //                 code: "SUN", subject: {}, hasEduNext: false
+    //             }
+    //         ],
+    //     };
+    //     originalSlots.push(slot);
+    // }
 
     const [scheduleOfWeek, setScheduleOfWeek] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -194,13 +194,50 @@ function ScheduleOfWeek(props) {
 
     const fetchSchedule = async () => {
         setIsLoading(true);
-        setScheduleOfWeek(slots);
+        let resSlots = await getAllSlot();
+        let clonedSlots = [];
+        if (resSlots && resSlots.dt) {
+            const slots = resSlots.dt;
+            for (let i = 0; i < slots.length; i++) {
+                const slot = {
+                    name: slots[i].description,
+                    code: slots[i].code1,
+                    duration: '',
+                    room: '',
+                    day: [
+                        {
+                            code: "MON", subject: {}, hasEduNext: false
+                        },
+                        {
+                            code: "TUE", subject: {}, hasEduNext: false
+                        },
+                        {
+                            code: "WED", subject: {}, hasEduNext: false
+                        },
+                        {
+                            code: "THU", subject: {}, hasEduNext: false
+                        },
+                        {
+                            code: "FRI", subject: {}, hasEduNext: false
+                        },
+                        {
+                            code: "SAT", subject: {}, hasEduNext: false
+                        },
+                        {
+                            code: "SUN", subject: {}, hasEduNext: false
+                        }
+                    ],
+                };
+                clonedSlots.push(slot);
+            }
+            setScheduleOfWeek(clonedSlots);
+        }
         if (sortQuery) {
-            let res = await getAllSchedule(sortQuery);
-            if (res && res.dt && res.dt.length > 0) {
-                let cloneSchedule = [...slots];
+            let resSchedule = await getAllSchedule(sortQuery);
+            if (resSchedule && resSchedule.dt && resSchedule.dt.length > 0) {
+                let cloneSchedule = [...clonedSlots];
                 cloneSchedule.forEach(slot => {
-                    res.dt.forEach(schedule => {
+                    resSchedule.dt.forEach(schedule => {
                         if (slot.name === schedule.name) {
                             slot.duration = schedule.duration;
                             slot.room = schedule.room;
