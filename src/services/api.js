@@ -39,3 +39,7 @@ export const updateSchedule = (data) => {
 export const getAccount = () => {
     return axios.get(`/api/v1/auth/account`);
 };
+
+export const logout = () => {
+    return axios.post(`/api/v1/auth/logout`);
+};

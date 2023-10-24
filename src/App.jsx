@@ -78,7 +78,7 @@ function App() {
   }, []);
 
   const fetchAccount = async () => {
-    if (window.location.pathname !== '/Login' || window.location.pathname !== '/Register') {
+    if (window.location.pathname !== '/Login' || window.location.pathname !== '/Register' || window.location.pathname !== '/') {
       let res = await getAccount();
       if (res && res.dt) {
         dispatch(getAccountAction(res.dt.user));
@@ -88,9 +88,10 @@ function App() {
 
   return (
     <>
-      {!isLoading || window.location.pathname === '/Login' || window.location.pathname === '/Register'
+      {!isLoading || window.location.pathname === '/Login' || window.location.pathname === '/Register' || window.location.pathname === '/'
         ? <RouterProvider router={router} />
         : <Loading />}
+      {/* <RouterProvider router={router} /> */}
     </>
 
   );
