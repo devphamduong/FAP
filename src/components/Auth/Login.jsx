@@ -18,7 +18,8 @@ function Login() {
         setIsLoading(true);
         let res = await login(values);
         if (res && res.dt) {
-            dispatch(loginAction(res.dt));
+            localStorage.setItem('access_token', res.dt.access_token);
+            dispatch(loginAction(res.dt.user));
             message.success(res.em);
             navigate('/');
         } else {

@@ -20,7 +20,7 @@ function Header(props) {
                     <Row align={'middle'} justify={'end'}>
                         {isAuthenticated && user?.username && <Col><Tag color="#87d068">{user?.username}</Tag></Col>}
                         {isAuthenticated
-                            ? <Col><Tag color="#87d068" style={{ cursor: 'pointer' }} onClick={() => navigate('/Logout')}>Logout</Tag></Col>
+                            ? <Col><Tag color="#87d068" style={{ cursor: 'pointer' }} onClick={() => navigate('/Login')}>Logout</Tag></Col>
                             : <Col><Tag color="#87d068" style={{ cursor: 'pointer' }} onClick={() => navigate('/Login')}>Login</Tag></Col>
                         }
                         <Col><Tag color="#87d068">CAMPUS: FPTU-Hòa Lạc</Tag></Col>
