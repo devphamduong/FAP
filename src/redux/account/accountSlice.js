@@ -23,10 +23,15 @@ export const accountSlice = createSlice({
             state.isAuthenticated = true;
             state.isLoading = false;
             state.user = action.payload;
-        }
+        },
+        getAccountAction: (state, action) => {
+            state.isAuthenticated = true;
+            state.isLoading = false;
+            state.user = action.payload;
+        },
     },
 });
 
-export const { loginAction } = accountSlice.actions;
+export const { loginAction, getAccountAction } = accountSlice.actions;
 
 export default accountSlice.reducer;

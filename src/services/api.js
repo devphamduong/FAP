@@ -35,3 +35,7 @@ export const getAllSlot = () => {
 export const updateSchedule = (data) => {
     return axios.put(`/api/v1/schedule`, { ...data });
 };
+
+export const getAccount = () => {
+    return axios.get(`/api/v1/auth/account`);
+};

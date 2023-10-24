@@ -16,6 +16,8 @@ import Loading from './components/Loading';
 import Register from './components/Auth/Register';
 import ChangeSlot from './components/Teacher/ChangeSlot';
 import ProtectedRoute from './components/ProtectedRoute';
+import { getAccount } from './services/api';
+import { getAccountAction } from './redux/account/accountSlice';
 
 const Layout = () => {
   return (
@@ -77,19 +79,18 @@ function App() {
 
   const fetchAccount = async () => {
     if (window.location.pathname !== '/Login' || window.location.pathname !== '/Register') {
-      //let res = await getAccount();
-      //if (res && res.data) {
-      //  dispatch(getAccountAction(res.data.user));
-      //}
+      let res = await getAccount();
+      if (res && res.dt) {
+        dispatch(getAccountAction(res.dt.user));
+      }
     }
   };
 
   return (
     <>
-      {/* {!isLoading || window.location.pathname === '/login' || window.location.pathname === '/register'
+      {!isLoading || window.location.pathname === '/Login' || window.location.pathname === '/Register'
         ? <RouterProvider router={router} />
-        : <Loading />} */}
-      <RouterProvider router={router} />
+        : <Loading />}
     </>
 
   );
