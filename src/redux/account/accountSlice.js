@@ -29,6 +29,20 @@ export const accountSlice = createSlice({
             state.isLoading = false;
             state.user = action.payload;
         },
+        getAccountActionFail: (state, action) => {
+            state.isAuthenticated = false;
+            state.isLoading = false;
+            state.user = {
+                email: "",
+                fullName: "",
+                username: "",
+                gender: "",
+                id: "",
+                dob: "",
+                address: "",
+                role: ""
+            };
+        },
         logoutAction: (state, action) => {
             localStorage.removeItem('access_token');
             state.isAuthenticated = false;
@@ -46,6 +60,6 @@ export const accountSlice = createSlice({
     },
 });
 
-export const { loginAction, getAccountAction, logoutAction } = accountSlice.actions;
+export const { loginAction, getAccountAction, logoutAction, getAccountActionFail } = accountSlice.actions;
 
 export default accountSlice.reducer;

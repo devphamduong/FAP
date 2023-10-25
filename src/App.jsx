@@ -5,6 +5,7 @@ import {
   createBrowserRouter,
   Outlet,
   RouterProvider,
+  useNavigate,
 } from "react-router-dom";
 import ScheduleOfWeek from './components/TimeTable/ScheduleOfWeek';
 import TimeTable from './components/TimeTable/TimeTable';
@@ -17,7 +18,8 @@ import Register from './components/Auth/Register';
 import ChangeSlot from './components/Teacher/ChangeSlot';
 import ProtectedRoute from './components/ProtectedRoute';
 import { getAccount } from './services/api';
-import { getAccountAction } from './redux/account/accountSlice';
+import { getAccountAction, getAccountActionFail } from './redux/account/accountSlice';
+import { notification } from 'antd';
 
 const Layout = () => {
   return (
@@ -72,6 +74,7 @@ const router = createBrowserRouter([
 function App() {
   const dispatch = useDispatch();
   const isLoading = useSelector(state => state.account.isLoading);
+  //const navigate = useNavigate();
 
   useEffect(() => {
     fetchAccount();
@@ -80,7 +83,7 @@ function App() {
   const fetchAccount = async () => {
     if (window.location.pathname !== '/Login' || window.location.pathname !== '/Register' || window.location.pathname !== '/') {
       let res = await getAccount();
-      if (res && res.dt) {
+      if (res && +res.ec === 0 && res.dt) {
         dispatch(getAccountAction(res.dt.user));
       }
     }

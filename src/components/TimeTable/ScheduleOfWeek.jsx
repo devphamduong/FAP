@@ -162,14 +162,14 @@ function ScheduleOfWeek(props) {
 
     const renderSubject = (record, day) => {
         const schedule = record.day.find(item => item.code === day);
+        const room = record.day.find(item => item.code === day)?.room;
         const subject = record.day.find(item => item.code === day)?.subject;
         if (!_.isEmpty(subject)) {
-            const courseHasEduNext = record.day.findIndex(item => item.code === day && item.hasEduNext === true);
             return (
                 <>
-                    <p><Link to={`/ActivityDetail/Schedule/${schedule.id}`}>{subject?.name}</Link> - at {record.room}</p>
+                    <p><Link to={`/ActivityDetail/Schedule/${schedule.id}`}>{subject?.name}</Link> - at {room}</p>
                     <div><Button size='small' style={{ color: 'white', fontWeight: 700, backgroundColor: '#777' }}>Meet URL</Button></div>
-                    {courseHasEduNext > -1 && record.day[courseHasEduNext] &&
+                    {subject?.hasEduNext &&
                         <div><Button size='small' style={{ color: 'white', fontWeight: 700, backgroundColor: '#337ab7' }}>EduNext</Button></div>
                     }
                     <div>(Not yet)</div>
@@ -203,28 +203,27 @@ function ScheduleOfWeek(props) {
                     name: slots[i].description,
                     code: slots[i].code1,
                     duration: '',
-                    room: '',
                     day: [
                         {
-                            code: "MON", subject: {}, hasEduNext: false
+                            code: "MON", subject: {}, room: ''
                         },
                         {
-                            code: "TUE", subject: {}, hasEduNext: false
+                            code: "TUE", subject: {}, room: ''
                         },
                         {
-                            code: "WED", subject: {}, hasEduNext: false
+                            code: "WED", subject: {}, room: ''
                         },
                         {
-                            code: "THU", subject: {}, hasEduNext: false
+                            code: "THU", subject: {}, room: ''
                         },
                         {
-                            code: "FRI", subject: {}, hasEduNext: false
+                            code: "FRI", subject: {}, room: ''
                         },
                         {
-                            code: "SAT", subject: {}, hasEduNext: false
+                            code: "SAT", subject: {}, room: ''
                         },
                         {
-                            code: "SUN", subject: {}, hasEduNext: false
+                            code: "SUN", subject: {}, room: ''
                         }
                     ],
                 };
@@ -240,14 +239,12 @@ function ScheduleOfWeek(props) {
                     resSchedule.dt.forEach(schedule => {
                         if (slot.name === schedule.name) {
                             slot.duration = schedule.duration;
-                            slot.room = schedule.room;
                             const foundDay = slot.day.findIndex(item => item.code === schedule.day.code);
                             if (foundDay !== -1) {
                                 slot.day[foundDay].id = schedule.id;
                                 slot.day[foundDay].subject = schedule.day.subject;
-                                slot.day[foundDay].hasEduNext = schedule.day.hasEduNext;
+                                slot.day[foundDay].room = schedule.day.room;
                             }
-
                         }
                     });
                 });
@@ -285,7 +282,7 @@ function ScheduleOfWeek(props) {
                     <p>Các phòng bắt đầu bằng DE thuộc tòa nhà Delta. VD: DE,..</p>
                     <p>Little UK (LUK) thuộc tầng 5 tòa nhà Delta</p>
                 </div>
-                {user.role === 'TEACHER' &&
+                {user.role === 'Teacher' &&
                     <Button onClick={() => navigate('/Teacher/ChangeSlot')} style={{ margin: '5px 0 20px 0' }}>Change slot</Button>
                 }
                 <div>

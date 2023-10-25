@@ -91,11 +91,8 @@ function ChangeSlot(props) {
         const currentDate = moment().format('MM/DD/YYYY');
         const currentTime = moment().format('HH:mm');
         const foundSlot = arrSlot.find(item => item.code1 === slot);
-        const durationFrom = moment(foundSlot.time[0].duration.split('-')[0], 'HH:mm')._i;
-        const durationTo = moment(foundSlot.time[0].duration.split('-')[1], 'HH:mm')._i;
-        // console.log(currentTime);
-        // console.log(durationFrom, durationTo);
-        // console.log(durationFrom <= currentTime, durationTo <= currentTime);
+        const durationFrom = moment(foundSlot.time[0].duration.split('-')[0], 'HH:mm').format('HH:mm');
+        const durationTo = moment(foundSlot.time[0].duration.split('-')[1], 'HH:mm').format('HH:mm');
         if (dateChange === currentDate) {
             if (currentTime >= durationFrom && currentTime >= durationTo) {
                 notification.error({
@@ -107,7 +104,7 @@ function ChangeSlot(props) {
             } else if (currentTime >= durationFrom && currentTime < durationTo) {
                 notification.error({
                     message: "An error occurred",
-                    description: `Class started ${moment(durationFrom, 'HH:mm').startOf('hour').fromNow()}. You can only switch to later slots.`,
+                    description: `Class started ${moment(durationFrom, 'HH:mm').fromNow()}. You can only switch to later slots.`,
                     duration: 5
                 });
                 return false;
@@ -171,28 +168,28 @@ function ChangeSlot(props) {
             <div className="change-slot-content">
                 <Space direction="vertical" style={{ width: '100%' }}>
                     {listCourses && listCourses.length > 0 &&
-                        listCourses.map((itemC, index) => {
+                        listCourses.map((itemC, indexC) => {
                             return (
                                 <Collapse key={`course-${itemC.subject}`}
                                     items={[
                                         {
-                                            key: index,
+                                            key: indexC,
                                             label: <>{itemC.subject}</>,
                                             children:
                                                 <Space direction="vertical" style={{ width: '100%' }}>
                                                     {
-                                                        itemC.schedule.map(itemS => {
+                                                        itemC.schedule.map((itemS, indexS) => {
                                                             return (
                                                                 <Row align={'middle'} key={`Schedule-${itemS.scheduleId}`}>
                                                                     <Col>
                                                                         <Descriptions column={2} size={'small'} bordered items={[
                                                                             {
-                                                                                key: index,
+                                                                                key: indexS,
                                                                                 label: 'Date',
                                                                                 children: moment(itemS.date).format("MMMM DD YYYY")
                                                                             },
                                                                             {
-                                                                                key: index + 1,
+                                                                                key: indexS + 1,
                                                                                 label: 'Slot',
                                                                                 children: itemS.code.substring(1)
                                                                             }
@@ -201,10 +198,10 @@ function ChangeSlot(props) {
                                                                     <Col><div style={{ display: 'flex', justifyContent: 'center' }}><MdPublishedWithChanges style={{ fontSize: 20 }} /></div></Col>
                                                                     <Col>
                                                                         <Form form={form} layout="inline" style={{ justifyContent: 'center' }}>
-                                                                            <Form.Item name='date'>
+                                                                            <Form.Item name={`course-${itemC.subject}-date-${itemS.date}`}>
                                                                                 <DatePicker disabledDate={d => !d || d.isBefore(moment(itemS.date, 'YYYY-MM-DD'))} allowClear={false} onChange={onChange} format={dateFormatList} style={{ cursor: 'pointer' }} />
                                                                             </Form.Item>
-                                                                            <Form.Item name='slot'>
+                                                                            <Form.Item name={`course-${itemC.subject}-slot-${indexS}`}>
                                                                                 <Select
                                                                                     placeholder="Select a slot"
                                                                                     style={{ width: 120 }}
