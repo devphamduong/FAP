@@ -1,6 +1,30 @@
 .home-container {
+    button {
+
+        &.active,
+        &:hover {
+            border-color: #e38d13;
+        }
+    }
 
     .cart-custom {
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+        .ant-table-thead {
+            .ant-table-cell {
+                background-color: #36c;
+                color           : white;
+                border-color    : #e38d13;
+            }
+
+        }
+
+        .ant-table-cell {
+            padding: 3px 8px !important;
+
+            .custom-notice {
+                color: #2F5597;
+            }
+        }
     }
 }

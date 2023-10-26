@@ -121,8 +121,9 @@ function ActivityDetail(props) {
     const columns = [
         {
             title: 'Index',
-            dataIndex: 'key',
-            key: 'key',
+            render: (text, record, index) => {
+                return index + 1;
+            },
         },
         {
             title: 'IMAGE',
