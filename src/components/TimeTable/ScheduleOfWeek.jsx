@@ -290,8 +290,8 @@ function ScheduleOfWeek(props) {
                 </div>
                 <p><span style={{ fontWeight: 'bold' }}>More note / Chú thích thêm</span>:</p>
                 <ul>
-                    <li>(<span style={{ color: 'green' }}>attended</span>): duongpche163153 had attended this activity / Phạm Chu Dương đã tham gia hoạt động này</li>
-                    <li>(<span style={{ color: 'red' }}>absent</span>): duongpche163153 had NOT attended this activity / Phạm Chu Dương đã vắng mặt buổi này</li>
+                    <li>(<span style={{ color: 'green' }}>attended</span>): {user?.username} had attended this activity / {user?.fullName} đã tham gia hoạt động này</li>
+                    <li>(<span style={{ color: 'red' }}>absent</span>): {user?.username} had NOT attended this activity / {user?.fullName} đã vắng mặt buổi này</li>
                     <li>(-): no data was given / chưa có dữ liệu</li>
                 </ul>
             </div>
