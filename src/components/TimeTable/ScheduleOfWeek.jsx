@@ -19,47 +19,13 @@ function ScheduleOfWeek(props) {
     const user = useSelector(state => state.account.user);
     const isAuthenticated = useSelector(state => state.account.isAuthenticated);
 
-    // const originalSlots = [];
-    // for (let i = 0; i <= 12; i++) {
-    //     const slot = {
-    //         name: `Slot ${i}`,
-    //         code: `S${i}`,
-    //         duration: '',
-    //         room: '',
-    //         day: [
-    //             {
-    //                 code: "MON", subject: {}, hasEduNext: false
-    //             },
-    //             {
-    //                 code: "TUE", subject: {}, hasEduNext: false
-    //             },
-    //             {
-    //                 code: "WED", subject: {}, hasEduNext: false
-    //             },
-    //             {
-    //                 code: "THU", subject: {}, hasEduNext: false
-    //             },
-    //             {
-    //                 code: "FRI", subject: {}, hasEduNext: false
-    //             },
-    //             {
-    //                 code: "SAT", subject: {}, hasEduNext: false
-    //             },
-    //             {
-    //                 code: "SUN", subject: {}, hasEduNext: false
-    //             }
-    //         ],
-    //     };
-    //     originalSlots.push(slot);
-    // }
-
     const [scheduleOfWeek, setScheduleOfWeek] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [sortQuery, setSortQuery] = useState(`userId=${user.id}&startDate=${moment().startOf('week').format('MM/DD/YYYY')}&endDate=${moment().endOf('week').format('MM/DD/YYYY')}`);
-    const [currentWeek, setCurrentWeek] = useState(moment(moment().endOf('week').format('MM/DD/YYYY'), 'MM/DD/YYYY').isoWeek());
+    const [sortQuery, setSortQuery] = useState(`userId=${user.id}&startDate=${moment().startOf('week').subtract(1, 'week').add(1, 'day').format('MM/DD/YYYY')}&endDate=${moment().endOf('week').subtract(1, 'week').add(1, 'day').format('MM/DD/YYYY')}`);
+    const [currentWeek, setCurrentWeek] = useState(moment(moment().startOf('week').format('MM/DD/YYYY'), 'MM/DD/YYYY').isoWeek());
 
     const customWeekStartEndFormat = (value) =>
-        `${dayjs(value).startOf('week').format(weekFormat)} - ${dayjs(value).endOf('week').format(weekFormat)}`;
+        `${dayjs(value).startOf('week').add(1, 'day').format(weekFormat)} - ${dayjs(value).endOf('week').add(1, 'day').format(weekFormat)}`;
 
     const handleChangeWeek = (date, dateString) => {
         let query = buildRangeWeek(date.$d.getFullYear(), dateString.split(' - '));
@@ -76,7 +42,7 @@ function ScheduleOfWeek(props) {
                 <>
                     <p>WEEK</p>
                     <span>
-                        <DatePicker size='small' allowClear={false} defaultValue={dayjs()} format={customWeekStartEndFormat} picker="week" onChange={handleChangeWeek} style={{ cursor: 'pointer' }} />
+                        <DatePicker size='small' allowClear={false} defaultValue={dayjs().subtract(1, 'week')} format={customWeekStartEndFormat} picker="week" onChange={handleChangeWeek} style={{ cursor: 'pointer' }} />
                     </span>
                 </>,
             dataIndex: 'name',
